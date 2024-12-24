@@ -1,0 +1,42 @@
+import { Meta, Primary, Controls, Story } from '@storybook/blocks'; import * as DemoStories from './demo.stories'
+Overview
+The Meter Gauge Component is a dynamic visualization tool for Pega Constellation applications. It displays a circular gauge with configurable intervals (e.g., Good, Warning, Danger), receiving input values directly from Pega. This component helps users quickly interpret data and make informed decisions.
+
+Key Features
+Dynamic Interval Configuration: Define custom intervals such as Good (0–60), Warning (60–100), and Danger (above 100). Intervals are dynamically fetched from a backend data source in Pega, ensuring flexibility.
+Customizable Units: Display units (e.g., km/h, %, °C) alongside the value, ensuring clarity in data representation.
+Color-Coded Intervals: Visual differentiation of ranges using colors (e.g., green for Good, yellow for Warning, red for Danger).
+Responsive Design: Adapts seamlessly to different screen sizes, ensuring consistent performance across devices.
+Performance Optimization: Lightweight and efficient, ensuring minimal impact on application performance.
+Props
+Deployment and Integration Instructions
+Data Configuration in Pega
+Create a Data Type (e.g., GaugeConfiguration) with the following columns:
+Unit: The unit of measurement (e.g., km/h, %, °C).
+Intervals: JSON object defining intervals (e.g., {"Good": "0-60", "Warning": "60-100", "Danger": ">100"}).
+Value: The current value to be displayed.
+Example:
+Unit	Intervals	Value
+%	{"Good": "0-60", "Warning": "60-100", "Danger": ">100"}	75
+---	---	---	---
+Fetch this configuration using a Data Page (e.g., D_GaugeConfig).
+Component Configuration in Pega
+Add the Meter Gauge Component to your UI using the following settings:
+Data Page: Specify the Data Page (e.g., D_GaugeConfig.pxResults).
+Value: Bind the component to the Value property.
+Unit: Bind the component to the Unit property.
+Intervals: Bind the component to the Intervals property.
+Frontend Implementation Use CSS and JavaScript to create a responsive and visually appealing gauge. The following React component implementation demonstrates how to render the Meter Gauge with dynamic intervals, color-coded ranges, and smooth animations.
+Example Use Case for the Meter Gauge Component in Pega Constellation
+The Meter Gauge component is versatile and can be utilized across various scenarios to enhance data visualization and support decision-making. Below are examples of practical use cases:
+
+1. System Health Monitoring
+Objective: Monitor server or application health metrics, such as CPU utilization, memory usage, or disk space.
+Intervals:
+Good: 0–60% (Green)
+Warning: 61–80% (Yellow)
+Danger: 81–100% (Red)
+Example Scenario:
+A system administrator monitors server CPU utilization through a dashboard. The Meter Gauge shows the CPU usage percentage in real-time, changing color to yellow or red as thresholds are crossed, allowing for proactive issue resolution.
+Contributors
+This component was contributed by Khozema Nagdi working with Bits In Glass | www.bitsinglass.com
