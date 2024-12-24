@@ -1,0 +1,92 @@
+# PegaExtensionsGrid Component
+
+## Overview
+
+The `PegaExtensionsGrid` component is a dynamic and configurable grid component designed for integration with Pega Constellation applications. It enables developers to display, edit, and paginate tabular data fetched from Pega Data Views. The component supports features like custom column definitions, sorting, row-level editing, and error handling, ensuring a seamless user experience.
+
+---
+
+## Props
+
+| Prop Name          | Type      | Description                                                                 | Required | Default Value |
+|---------------------|-----------|-----------------------------------------------------------------------------|----------|---------------|
+| `dataViewName`      | `string`  | Name of the Data View to fetch data from.                                   | ✅       | N/A           |
+| `sorting`           | `boolean` | Enables sorting functionality on grid columns.                             | ❌       | `false`       |
+| `stripedRows`       | `boolean` | Adds alternating row colors for better readability.                        | ❌       | `false`       |
+| `loadingMessage`    | `string`  | Message to display while data is loading.                                  | ❌       | `'Loading...'`|
+| `columnSearch`      | `boolean` | Enables column-wise search functionality.                                  | ❌       | `false`       |
+| `uniqueKey`         | `string`  | Unique identifier for each row in the grid.                                | ✅       | N/A           |
+| `tableColumns`      | `string`  | Comma-separated list of column names to display.                           | ❌       | N/A           |
+| `fieldsToUpdate`    | `string`  | Fields to update when a row is edited.                                     | ✅       | N/A           |
+| `savablePage`       | `string`  | Savable page configuration to save edited data.                            | ✅       | N/A           |
+| `pagination`        | `boolean` | Enables pagination for the grid.                                           | ❌       | `false`       |
+| `pageSize`          | `number`  | Number of rows to display per page if pagination is enabled.               | ❌       | `10`          |
+
+---
+
+## Features
+
+### Data Fetching
+- Fetches data from the specified Pega Data View (`dataViewName`) using the Pega Data API utilities.
+- Supports optional pagination and dynamic column rendering based on the `tableColumns` prop.
+
+### Validation
+- Validates required props (`dataViewName`, `uniqueKey`, and `savablePage`) to ensure proper configuration.
+- Displays detailed error messages when the component is misconfigured.
+
+### Customization
+- Dynamically configures grid columns from the `tableColumns` prop or automatically based on the data schema.
+- Offers configurable features like sorting, column-based searching, and striped rows for enhanced usability.
+
+### Error Handling
+- Gracefully handles API errors and displays meaningful messages to the user.
+- Toggles between a detailed and minimal error view for debugging purposes.
+
+### Editing and Saving
+- Supports inline editing of grid rows with a popup interface (`EditRowPopup`).
+- Saves edited rows to the specified savable page (`savablePage`).
+
+### Pagination
+- Implements server-side pagination with total page calculations.
+- Allows users to navigate between pages using the `Pagination` component.
+
+
+### Limitations
+
+1. **Delete and Multiple Actions:** The current version does not support row deletion or bulk actions (e.g., batch delete). These features will be included in future versions.
+2. **Column Definition Constraints:** The `tableColumns` prop is a comma-separated list, which limits the dynamic customization of column properties beyond display names. Future updates may provide more advanced column customization options.
+3. **Inline Editing Limitations:** Inline editing is currently available only through a popup interface, which may not suit all user scenarios. The future version may include direct row editing.
+4. **Pagination Performance:** Server-side pagination is supported, but large datasets with complex filters may lead to slower load times or performance issues.
+5. **Error Handling Customization:** The error handling mechanism is currently basic, with limited options for customizing error messages or handling different types of errors beyond simple API failures.
+
+---
+
+### Enhancements
+
+1. **Delete and Bulk Actions:** Future versions will introduce the ability to delete individual rows as well as support for batch delete and other bulk actions.
+2. **Advanced Column Customization:** The ability to define custom column types, such as dropdowns or checkboxes, and column-specific styling will be added.
+3. **Direct Row Editing:** Inline row editing will be introduced, allowing users to edit data directly within the grid, removing the need for a popup interface.
+4. **Improved Pagination Handling:** Advanced pagination features, such as infinite scrolling or lazy loading, will be considered to improve performance and usability.
+5. **Customizable Error Handling:** Enhanced error handling with more options to customize error views, including retry mechanisms or user-friendly error messaging, will be added in future updates.
+
+---
+
+## Example Usage
+
+```tsx
+import PegaExtensionsGrid from './PegaExtensionsGrid';
+
+<PegaExtensionsGrid
+  label="User Records"
+  dataViewName="D_UserRecords"
+  sorting={true}
+  columnSearch={true}
+  loadingMessage="Fetching user data..."
+  stripedRows={true}
+  uniqueKey="UserID"
+  tableColumns="Name,Email,PhoneNumber"
+  fieldsToUpdate="Name,Email,PhoneNumber"
+  savablePage="pyUserPage"
+  pagination={true}
+  pageSize={20}
+/>;
