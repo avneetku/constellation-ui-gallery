@@ -1,0 +1,40 @@
+{
+  "name": "Pega_Extensions_MeterGaugeV2",
+  "label": "Meter Gauge V2",
+  "description": "Meter Gauge V2",
+  "organization": "Pega",
+  "version": "1.0.0",
+  "library": "Extensions",
+  "allowedApplications": [],
+  "componentKey": "Pega_Extensions_MeterGaugeV2",
+  "type": "Widget",
+  "subtype": "PAGE",
+  "icon": "OneColumnPage.svg",
+  "properties": [
+    {
+      "name": "label",
+      "label": "Label value",
+      "format": "TEXT",
+      "defaultValue":" "
+    },
+    {
+      "name": "guageValue",
+      "label": "Value",
+      "format": "TEXT",
+      "defaultValue":"60"
+    },
+    {
+      "name": "interval",
+      "label": "Interval",
+      "format": "NUMBER",
+      "defaultValue":"60"
+    },
+    {
+      "name": "unit",
+      "label": "Unit",
+      "format": "TEXT",
+      "defaultValue":"60"
+    }
+  ],
+  "defaultConfig": {}
+}
