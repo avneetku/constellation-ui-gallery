@@ -3,19 +3,19 @@
 // @ts-nocheck
 import type { Meta, StoryObj } from '@storybook/react';
 
-import PegaExtensionsGrid from './index';
+import PegaExtensionsDataGrid from './index';
 
 
 import configProps from './mock';
 
-const meta: Meta<typeof PegaExtensionsGrid> = {
-  title: 'PegaExtensionsGrid',
-  component: PegaExtensionsGrid,
+const meta: Meta<typeof PegaExtensionsDataGrid> = {
+  title: 'PegaExtensionsDataGrid',
+  component: PegaExtensionsDataGrid,
   excludeStories: /.*Data$/
 };
 
 export default meta;
-type Story = StoryObj<typeof PegaExtensionsGrid>;
+type Story = StoryObj<typeof PegaExtensionsDataGrid>;
 
 if (!window.PCore) {
   window.PCore = {};
@@ -39,7 +39,7 @@ const worklistData = {
   }
 };
 
-export const BasePegaExtensionsGrid: Story = args => {
+export const BasePegaExtensionsDataGrid: Story = args => {
   window.PCore.getDataApiUtils = () => {
     return {
       getData: () => {
@@ -121,12 +121,12 @@ export const BasePegaExtensionsGrid: Story = args => {
 
   return (
       <>
-        <PegaExtensionsGrid {...props} {...args} />
+        <PegaExtensionsDataGrid {...props} {...args} />
       </>
     );
 };
 
-BasePegaExtensionsGrid.args = {
+BasePegaExtensionsDataGrid.args = {
   label: configProps.label,
   uniqueKey: configProps.uniqueKey,
   tableColumns: configProps.tableColumns,

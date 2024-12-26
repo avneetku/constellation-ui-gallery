@@ -1,13 +1,13 @@
 {
     "components-directory-path": "src/components",
     "server-config": {
-        "rulesetName": "",
-        "rulesetVersion": "",
+        "rulesetName": "GurbTest",
+        "rulesetVersion": "01-01-01",
         "sourceOfComponents": "Server",
         "devBuild": false,
         "serverType": "infinity",
-        "server": "",
-        "clientId": "",
+        "server": "https://3kjm3ikm.pegace.net/prweb",
+        "clientId": "10095186356008396159",
         "clientSecret_comment": "Needed only when using 'passwordCreds' or 'clientCreds' grantType",
         "clientSecret": "",
         "grantType": "authCode",

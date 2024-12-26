@@ -27,12 +27,6 @@ const ListComponent: React.FC<ListComponentProps> = ({ sorting, data, columns, s
     setVisibleColumns(columns.map((col) => col));
   }, [columns]);
 
-  // eslint-disable-next-line no-console
-  console.log(sorting);
-
-  // eslint-disable-next-line no-console
-  console.log('data', data);
-
   const handleSort = (column: string) => {
     if (sortBy === column) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -115,12 +109,11 @@ const ListComponent: React.FC<ListComponentProps> = ({ sorting, data, columns, s
               .map((col) => (
                 <th
                   key={col}
-                  onClick={() => handleSort(col)}
-                  style={{ cursor: 'pointer' }}
+                  onClick={sorting ? () => handleSort(col) : () => {}}
+                  style={{ cursor: sorting ? 'pointer' : 'default' }}
                 >
                   {col}
-                  {sortBy === col &&
-                    (sortDirection === 'asc' ? '↑' : '↓')}
+                  {sortBy === col && sorting && (sortDirection === 'asc' ? '↑' : '↓')}
                 </th>
               ))}
             <th style={{ padding: '10px', border: '1px solid #ddd' }}>Actions</th>
@@ -261,6 +254,7 @@ const ListComponent: React.FC<ListComponentProps> = ({ sorting, data, columns, s
 
       {detailsPopupVisible && (
         <div
+          role="dialog"
           style={{
             position: 'fixed',
             top: 0,

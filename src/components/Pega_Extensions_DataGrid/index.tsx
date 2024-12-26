@@ -7,9 +7,9 @@ import Pagination from './Pagination';
 import ListComponent from './ListComponent';
 import type {Data} from './interfaces';
 
-import StyledPegaExtensionsGridWrapper from './styles';
+import StyledPegaExtensionsDataGridWrapper from './styles';
 
-interface PegaExtensionsGridProps extends PConnFieldProps {
+interface PegaExtensionsDataGridProps extends PConnFieldProps {
   // If any, enter additional props that only exist on TextInput here
     dataViewName: string,
     sorting: boolean,
@@ -25,7 +25,7 @@ interface PegaExtensionsGridProps extends PConnFieldProps {
 }
 
 
-function PegaExtensionsGrid(props: PegaExtensionsGridProps) {
+function PegaExtensionsDataGrid(props: PegaExtensionsDataGridProps) {
 
   const { label, dataViewName, sorting, columnSearch, loadingMessage, getPConnect, stripedRows, uniqueKey, fieldsToUpdate, savablePage, tableColumns, pagination, pageSize } = props;
   const [gridData, setGridData] = useState([]);
@@ -41,16 +41,6 @@ function PegaExtensionsGrid(props: PegaExtensionsGridProps) {
   const context = PConnect.getContextName();
   const [editPopupVisible, setEditPopupVisible] = useState(false);
   const [editableRow, setEditableRow] = useState<Data | null>(null);
-
-  PCore.getDataApiUtils().getDataViewMetadata(dataViewName, context)
-  .then((response : any) => {
-    // eslint-disable-next-line no-console
-    console.log(response);
-  })
-  .catch(e => {
-    // eslint-disable-next-line no-console
-    console.log(e);
-  });
 
   const validateProps = useCallback(() => {
     const errors: string[] = [];
@@ -155,7 +145,7 @@ function PegaExtensionsGrid(props: PegaExtensionsGridProps) {
   };
 
   return (
-    <StyledPegaExtensionsGridWrapper>
+    <StyledPegaExtensionsDataGridWrapper>
       <Header label={label} />
       { validationErrors.length > 0 && (
         <div className="data-container error">
@@ -224,9 +214,9 @@ function PegaExtensionsGrid(props: PegaExtensionsGridProps) {
         />
       ) }
 
-    </StyledPegaExtensionsGridWrapper>
+    </StyledPegaExtensionsDataGridWrapper>
   );
 
 }
 
-export default withConfiguration(PegaExtensionsGrid);
+export default withConfiguration(PegaExtensionsDataGrid);

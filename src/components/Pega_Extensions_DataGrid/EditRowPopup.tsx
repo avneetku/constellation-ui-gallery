@@ -2,12 +2,7 @@ import React, { useState } from 'react';
 import type { EditRowPopupProps, Data } from './interfaces';
 
 
-const EditRowPopup: React.FC<EditRowPopupProps> = ({ rowData, onUpdate, onClose, savablePage, uniqueKey }) => {
-
-  // eslint-disable-next-line no-console
-  console.log(rowData);
-  // eslint-disable-next-line no-console
-  console.log(uniqueKey);
+const EditRowPopup: React.FC<EditRowPopupProps> = ({ rowData, onUpdate, onClose, savablePage }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState<Data>(Object.fromEntries(Object.entries(rowData).filter(([key]) => !['pxUpdateDateTime', 'pxCreateDateTime','pxCommitDateTime','pxSaveDateTime'].includes(key))) || {});
