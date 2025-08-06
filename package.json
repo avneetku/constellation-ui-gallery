@@ -16,6 +16,8 @@
     "build-storybook": "storybook build --docs",
     "storybook-docs": "storybook dev --docs --port 6006",
     "test-storybook": "test-storybook",
+    "create": "custom-dx-components create",
+    "createAll": "custom-dx-components createAll",
     "lint": "run-p -cl lint:*",
     "fix": "run-p -cl fix:*",
     "test": "jest",
