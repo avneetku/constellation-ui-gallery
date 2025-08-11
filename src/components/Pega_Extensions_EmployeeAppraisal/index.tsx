@@ -1,84 +1,135 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { withConfiguration, Card } from '@pega/cosmos-react-core';
 import type { PConnFieldProps } from './PConnProps';
 import Table from './Table';
+import Search from './Search';
+import Pagination from './Pagination';
+import Appraisals from './Appraisals';
 
 import GlobalStyle from './styles';
 
 // interface for props
 interface PegaExtensionsEmployeeAppraisalProps extends PConnFieldProps {
-    datasource: Array<any>;
+    dataPage: string;
+    title: string;
+    loadingMessage: string;
+    columns: string;
+}
+
+interface Employee {
+  EmployeeID: string;
+  EmployeeName: string;
+  [key: string]: any;
 }
 
 function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalProps) {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { datasource = [], getPConnect } = props;
-  const [worklist, setWorklist] = useState([]);
+  const { getPConnect, dataPage, title, loadingMessage, columns } = props;
+  // const [employees, setEmployees] = useState([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [searchText, setSearchText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const PConnect = getPConnect();
-  const dataViewName = 'D_pyMyWorkList';
+  const dataViewName = 'D_Employee2List';
   const context = PConnect.getContextName();
 
-  const columns = [
-    { renderer: 'caseType', label: PConnect.getLocalizedValue('Case type', '', '') },
-    { renderer: 'insKey', label: PConnect.getLocalizedValue('Key', '', '') },
-    { renderer: 'status', label: PConnect.getLocalizedValue('Status', '', '') },
-    { renderer: 'stage', label: PConnect.getLocalizedValue('Stage', '', '') }
-  ];
+  const [selectedEmployee, setSelectedEmployee] = useState<{ id: string; } | null>(null);
+  const [appraisalData, setAppraisalData] = useState<any[]>([]);
+
+  const rawColumns = useMemo(() => {
+    return columns ? columns.split(',').map(col => col.trim()) : [];
+  }, [columns]);
+
+  const parsedColumns = rawColumns.map(col => ({
+    renderer: col,
+    label: PConnect.getLocalizedValue(col, '', '')
+  }));
 
   useEffect(() => {
     PCore.getDataApiUtils()
       .getData(dataViewName, {}, context)
-      // @ts-ignore
       .then((response: any) => {
         setIsLoading(false);
         if (response.data.data !== null) {
-          // table requires an index or will get setExtraStackFrame error
-          setWorklist(
+          console.log(response);
+          setEmployees(
             response.data.data.map((entry: any, index: number) => {
-              // mapping the data into the column names
-              // MUST have an id/index or will get a setExtraStackFrame error
-              // put a key in the table
-              return {
-                caseType: entry.pxProcessName,
-                insKey: entry.pxRefObjectInsName,
-                status: entry.pyAssignmentStatus,
-                stage: entry.pxTaskLabel,
-                id: index
-              };
+              const row: any = { id: index };
+              rawColumns.forEach(col => {
+                row[col] = entry?.[col] ?? '';
+              });
+              return row;
             })
           );
+        } else {
+          setEmployees([]);
         }
-        else {
-          setWorklist([]);
-          setIsLoading(false);
-        }
-
       })
       .catch((error: any) => {
-        setWorklist([]);
+        setEmployees([]);
         setIsLoading(false);
-        // eslint-disable-next-line no-console
         console.log(error);
       });
-  }, [context]);
+  }, [context, rawColumns]);
+
+
+  const handleSearch = (value: string) => {
+    // eslint-disable-next-line no-console
+    console.log(value);
+    setSearchText(value)
+  }
+
+  const handleViewDetails = (EmployeeID: string) => {
+    // eslint-disable-next-line no-console
+    console.log('View details clicked for:', EmployeeID);
+
+    const selected = employees.find((emp : any) => emp.EmployeeID === EmployeeID);
+    console.log(selected);
+
+    setSelectedEmployee({ id: EmployeeID });
+
+    setIsLoading(true);
+
+    PCore.getDataApiUtils()
+    .getData('D_AppraisalByEmployeeID', {}, context)
+    .then((response: any) => {
+      setIsLoading(false);
+      // eslint-disable-next-line no-console
+      console.log(response);
+      if (response.data.data !== null) {
+        setAppraisalData(response.data.data);
+      } else {
+        setAppraisalData([]);
+      }
+    })
+    .catch((error: any) => {
+      setAppraisalData([]);
+      setIsLoading(false);
+    });
+  };
 
   return (
     <>
-      <GlobalStyle />
-      <Card>
-        <Table
-          title={PConnect.getLocalizedValue('Employees', '', '')}
-          columns={columns}
-          data={worklist}
-          loading={isLoading}
-          loadingMessage={PConnect.getLocalizedValue('Loading Employees', '', '')}
-        />
-      </Card>
+      <div className='dashboard'>
+        <GlobalStyle />
+        <Card className="card">
+          <Search placeholder='Search by Employee ID or Name...' onChange={(value) => handleSearch(value)} />
+          <h1>{PConnect.getLocalizedValue(title, '', '')}</h1>
+          <br/>
+          <Table
+            columns={parsedColumns}
+            data={employees}
+            loading={isLoading}
+            loadingMessage={PConnect.getLocalizedValue(loadingMessage, '', '')}
+            onClick={handleViewDetails}
+          />
+          <Appraisals appraisals={appraisalData} employeeId={selectedEmployee?.id ?? null} EmployeeName={""} />
+        </Card>
+      </div>
     </>
   );
-
 }
 
 export default withConfiguration(PegaExtensionsEmployeeAppraisal);

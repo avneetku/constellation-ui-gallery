@@ -1,4 +1,3 @@
-
 /* eslint-disable react/jsx-no-useless-fragment */
 // @ts-nocheck
 import type { Meta, StoryObj } from '@storybook/react';
@@ -21,26 +20,67 @@ if (!window.PCore) {
   window.PCore = {};
 }
 
-const worklistData = {
+const employeesData = {
   data: {
     data: [
       {
-        pxProcessName: 'Loan',
-        pxRefObjectInsName: ' A-8002',
-        pyAssignmentStatus: 'New',
-        pxTaskLabel: 'Details'
+        EmployeeID: 'CTPL0123',
+        EmployeeName: 'Alice',
+        EmailAddress: 'alice@bitsinglass.com',
+        department: 'Pega',
+        jobTitle: 'Technical Lead',
+        practice: 'Pega',
+        action: 'View Details'
       },
       {
-        pxProcessName: 'Loan',
-        pxRefObjectInsName: ' A-7001',
-        pyAssignmentStatus: 'Open',
-        pxTaskLabel: 'Info'
+        EmployeeID: 'CTPL0456',
+        EmployeeName: 'Bob',
+        EmailAddress: 'bob@bitsinglass.com',
+        department: 'Development',
+        jobTitle: 'Software Engineer',
+        practice: 'Pega',
+        action: 'View Details'
+      }
+    ]
+  }
+};
+
+const appraisalData = {
+  data: {
+    data: [
+      {
+        yearRange: '2024–2025',
+        finalRating: 4,
+        score: 84,
+        kras: [
+          { name: 'Flexibility', weightage: '15%', selfRating: 4, managerRating: 4.5, finalRating: 4.3 },
+          { name: 'Job Knowledge', weightage: '15%', selfRating: 5, managerRating: 4.5, finalRating: 4.7 },
+          { name: 'Initiative', weightage: '20%', selfRating: 4, managerRating: 4, finalRating: 4 },
+          { name: 'Learning', weightage: '10%', selfRating: 3.5, managerRating: 4, finalRating: 3.8 },
+          { name: 'Leadership', weightage: '10%', selfRating: 4, managerRating: 4.5, finalRating: 4.2 },
+          { name: 'Communication Skills', weightage: '10%', selfRating: 3.5, managerRating: 4, finalRating: 3.8 },
+          { name: 'Policy Adherence', weightage: '20%', selfRating: 5, managerRating: 4.5, finalRating: 4.7 }
+        ],
+        employeeComments: 'Delivered critical projects on time and contributed to process automation.',
+        managerComments: 'Excellent delivery and ownership. Needs to improve in mentoring juniors.',
+        hrComments: 'Final score calculated using weighted average. Ready for next-level responsibilities.'
       },
       {
-        pxProcessName: 'Loan',
-        pxRefObjectInsName: ' A-9000',
-        pyAssignmentStatus: 'Open',
-        pxTaskLabel: 'Amount'
+        yearRange: '2023–2024',
+        finalRating: 3,
+        score: 75,
+        kras: [
+          { name: 'Flexibility', weightage: '15%', selfRating: 3.5, managerRating: 4, finalRating: 3.8 },
+          { name: 'Job Knowledge', weightage: '15%', selfRating: 4, managerRating: 4, finalRating: 4 },
+          { name: 'Initiative', weightage: '20%', selfRating: 3, managerRating: 3.5, finalRating: 3.3 },
+          { name: 'Learning', weightage: '10%', selfRating: 4, managerRating: 4.2, finalRating: 4.1 },
+          { name: 'Leadership', weightage: '10%', selfRating: 3.5, managerRating: 3.5, finalRating: 3.5 },
+          { name: 'Communication Skills', weightage: '10%', selfRating: 3, managerRating: 3.5, finalRating: 3.3 },
+          { name: 'Policy Adherence', weightage: '20%', selfRating: 4.5, managerRating: 4, finalRating: 4.2 }
+        ],
+        employeeComments: 'Handled client requests efficiently.',
+        managerComments: 'Good progress but can improve communication.',
+        hrComments: 'Consistent performer with good potential.'
       }
     ]
   }
@@ -49,14 +89,20 @@ const worklistData = {
 export const BasePegaExtensionsEmployeeAppraisal: Story = args => {
   window.PCore.getDataApiUtils = () => {
     return {
-      getData: () => {
+      getData: (dataPageName: string) => {
         return new Promise(resolve => {
-          resolve(worklistData);
+          if (dataPageName === 'D_Employee2List') {
+            resolve(employeesData);
+          } else if (dataPageName === 'D_AppraisalByEmployeeID') {
+            resolve(appraisalData);
+          } else {
+            resolve({ data: { data: [] } });
+          }
         });
       },
       getDataAsync: () => {
         return new Promise(resolve => {
-          resolve(worklistData);
+          resolve(employeesData);
         });
       }
     };
@@ -109,8 +155,9 @@ export const BasePegaExtensionsEmployeeAppraisal: Story = args => {
 };
 
 BasePegaExtensionsEmployeeAppraisal.args = {
-  header: configProps.header,
-  description: configProps.description,
-  whatsnewlink: configProps.whatsnewlink,
-  datasource: configProps.datasource,
+  dataPage: configProps.dataPage,
+  title: configProps.title,
+  loadingMessage: configProps.loadingMessage,
+  displayAs: configProps.displayAs,
+  columns: configProps.columns
 };

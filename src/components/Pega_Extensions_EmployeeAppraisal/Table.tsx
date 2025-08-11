@@ -7,25 +7,23 @@ type Column<T> = {
 };
 
 type TableProps<T> = {
-  title?: string;
   columns: Column<T>[];
   data: T[];
   loading?: boolean;
   loadingMessage?: string;
+  onClick: (value: string) => void;
 };
 
 function Table<T extends Record<string, any>>({
-  title,
   columns,
   data,
   loading = false,
   loadingMessage = 'Loading...',
+  onClick
 }: TableProps<T>) {
   return (
-    <div className="dashboard">
-      {title && <h1>{title}</h1>}
-
-      {loading ? (
+    <div>
+      { loading ? (
         <p className="notice">{loadingMessage}</p>
       ) : (
         <table>
@@ -34,6 +32,9 @@ function Table<T extends Record<string, any>>({
               {columns.map((col) => (
                 <th key={String(col.renderer)}>{col.label}</th>
               ))}
+              <th>
+                View All Appraisals
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -43,12 +44,15 @@ function Table<T extends Record<string, any>>({
               </tr>
             ) : (
               data.map((row) => (
-                <tr key={row.pxRefObjectInsName}>
+                <tr key={row.EmployeeID}>
                   {columns.map((col) => (
                     <td key={String(col.renderer)}>
                       {col.render ? col.render(row) : row[col.renderer as keyof T]}
                     </td>
                   ))}
+                  <td>
+                    <button onClick={() => onClick(row.EmployeeID)}>View Details</button>
+                  </td>
                 </tr>
               ))
             )}

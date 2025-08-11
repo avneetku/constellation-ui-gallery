@@ -1,7 +1,7 @@
 {
   "components-directory-path": "src/components",
   "server-config": {
-    "rulesetName": "Component",
+    "rulesetName": "DxComponent",
     "rulesetVersion": "01-01-01",
     "sourceOfComponents": "Server",
     "devBuild": false,

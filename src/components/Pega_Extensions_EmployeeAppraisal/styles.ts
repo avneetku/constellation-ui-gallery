@@ -10,9 +10,12 @@ const GlobalStyle = createGlobalStyle`
     color: #333;
   }
 
+  .card {
+    padding: 20px;
+  }
+
   .dashboard {
     max-width: 1200px;
-    margin: 0 auto;
   }
 
   h1 {
@@ -57,8 +60,8 @@ const GlobalStyle = createGlobalStyle`
   }
 
   input[type="text"] {
-    padding: 8px 12px;
-    width: 300px;
+    padding: 8px 12px !important;
+    width: 300px !important;
     margin-bottom: 15px;
     border-radius: 4px;
     border: 1px solid #ccc;
