@@ -1,9 +1,8 @@
 // @ts-nocheck
 const configProps = {
-  dataPage: 'D_pyMyWorkList',
+  dataPage: 'D_Employee2List',
   title: 'Employee Appraisals List',
-  columns: 'EmployeeID,EmployeeName,EmailAddress,department',
   loadingMessage: 'Loading',
-  displayAs : 'value'
+  detailsDataPage: 'D_EmployeeKRAList'
 };
 export default configProps;

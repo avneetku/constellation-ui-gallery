@@ -1,21 +1,16 @@
 import React from 'react';
+import type { PaginationProps } from './interfaces';
 
-interface Props {
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (page: number) => void;
-}
-
-const Pagination: React.FC<Props> = ({ currentPage, totalPages, onPageChange }) => {
+const Pagination: React.FC<PaginationProps> = ({ currentPage, totalPages, onPageChange }) => {
   const prevDisabled = currentPage <= 1;
   const nextDisabled = currentPage >= totalPages;
 
   return (
     <div style={{ display: 'flex', alignItems: 'center', margin: '10px 0' }}>
-      <button onClick={() => onPageChange(currentPage - 1)} disabled={prevDisabled}>
+      <button onClick={() => onPageChange(currentPage - 1)} disabled={prevDisabled} type='button'>
         Prev
       </button>
-      <button onClick={() => onPageChange(currentPage + 1)} disabled={nextDisabled}>
+      <button onClick={() => onPageChange(currentPage + 1)} disabled={nextDisabled} type='button'>
         Next
       </button>
     </div>

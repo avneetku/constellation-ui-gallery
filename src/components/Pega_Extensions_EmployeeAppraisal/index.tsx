@@ -1,134 +1,154 @@
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState, useMemo, useCallback } from 'react';
 import { withConfiguration, Card } from '@pega/cosmos-react-core';
 import type { PConnFieldProps } from './PConnProps';
 import Table from './Table';
 import Search from './Search';
-import Pagination from './Pagination';
 import Appraisals from './Appraisals';
-
 import GlobalStyle from './styles';
+import type { Employee } from './interfaces';
+import fetchDataPage from './apiUtils';
+import { debounce } from 'lodash';
 
-// interface for props
 interface PegaExtensionsEmployeeAppraisalProps extends PConnFieldProps {
-    dataPage: string;
-    title: string;
-    loadingMessage: string;
-    columns: string;
-}
-
-interface Employee {
-  EmployeeID: string;
-  EmployeeName: string;
-  [key: string]: any;
+  dataPage: string;
+  loadingMessage: string;
+  detailsDataPage: string;
 }
 
 function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalProps) {
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { getPConnect, dataPage, title, loadingMessage, columns } = props;
-  // const [employees, setEmployees] = useState([]);
+  const { getPConnect, dataPage, loadingMessage, detailsDataPage } = props;
   const [employees, setEmployees] = useState<Employee[]>([]);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [searchText, setSearchText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const PConnect = getPConnect();
-  const dataViewName = 'D_Employee2List';
   const context = PConnect.getContextName();
 
-  const [selectedEmployee, setSelectedEmployee] = useState<{ id: string; } | null>(null);
+  const [selectedEmployee, setSelectedEmployee] = useState<{ EmployeeID: string; EmployeeName: string; } | null>(null);
   const [appraisalData, setAppraisalData] = useState<any[]>([]);
+  const [isAppraisalModalOpen, setIsAppraisalModalOpen] = useState(false);
+  const [isAppraisalLoading, setIsAppraisalLoading] = useState(false);
 
-  const rawColumns = useMemo(() => {
-    return columns ? columns.split(',').map(col => col.trim()) : [];
-  }, [columns]);
+  const employeeListColumnsConfig = useMemo(
+    () => ([
+      { key: 'EmployeeID', label: 'Employee ID' },
+      { key: 'EmployeeName', label: 'Employee Name' },
+      { key: 'AppraisalId', label: 'Appraisal ID' },
+      { key: 'EmailAddress', label: 'Email' },
+      { key: 'Department', label: 'Department' },
+      { key: 'JobTitle', label: 'Job Title' },
+      { key: 'Practice', label: 'Practice' },
+      { key: 'Ratings', label: 'Ratings' },
+      { key: 'AppraisalDate', label: 'Appraisal Date' },
+      { key: 'Action', label: 'Action' }
+    ]),
+    []
+  );
 
-  const parsedColumns = rawColumns.map(col => ({
-    renderer: col,
-    label: PConnect.getLocalizedValue(col, '', '')
-  }));
+  const tableColumns = useMemo(
+    () => employeeListColumnsConfig.map(col => ({ key: col.key, label: PConnect.getLocalizedValue(col.label, '', '') })),
+    [employeeListColumnsConfig, PConnect]
+  );
+
+  const loadEmployees = useCallback(async () => {
+    // eslint-disable-next-line no-console
+    console.log('in loadEmployees');
+    setIsLoading(true);
+    const payload = searchText.trim()
+      ? { dataViewParameters: { query: searchText.trim() } }
+      : {};
+
+    const keys = employeeListColumnsConfig.map(c => c.key);
+    const data = await fetchDataPage<Employee>(dataPage, context, payload);
+    const formatted = data.map((entry: any, index: number) => {
+      const row: any = { id: index };
+      keys.forEach((key) => {
+        row[key] = entry?.[key] ?? '';
+      });
+      return row;
+    });
+    setEmployees(formatted);
+    setIsLoading(false);
+  }, [searchText, employeeListColumnsConfig, dataPage, context]);
+
+  const debouncedSearch = useMemo(
+    () => debounce(() => {
+      // eslint-disable-next-line no-console
+      console.log('in debouncedSearch');
+      loadEmployees();
+    }, 500),
+    [loadEmployees]
+  );
 
   useEffect(() => {
-    PCore.getDataApiUtils()
-      .getData(dataViewName, {}, context)
-      .then((response: any) => {
-        setIsLoading(false);
-        if (response.data.data !== null) {
-          console.log(response);
-          setEmployees(
-            response.data.data.map((entry: any, index: number) => {
-              const row: any = { id: index };
-              rawColumns.forEach(col => {
-                row[col] = entry?.[col] ?? '';
-              });
-              return row;
-            })
-          );
-        } else {
-          setEmployees([]);
-        }
-      })
-      .catch((error: any) => {
-        setEmployees([]);
-        setIsLoading(false);
-        console.log(error);
-      });
-  }, [context, rawColumns]);
-
+    // eslint-disable-next-line no-console
+    console.log('useEffect for searchText & debouncedSearch');
+    debouncedSearch();
+    return () => debouncedSearch.cancel();
+  }, [searchText, debouncedSearch]);
 
   const handleSearch = (value: string) => {
     // eslint-disable-next-line no-console
-    console.log(value);
-    setSearchText(value)
-  }
+    console.log('handleSearch');
+    setSearchText(value);
+  };
 
-  const handleViewDetails = (EmployeeID: string) => {
-    // eslint-disable-next-line no-console
-    console.log('View details clicked for:', EmployeeID);
-
-    const selected = employees.find((emp : any) => emp.EmployeeID === EmployeeID);
-    console.log(selected);
-
-    setSelectedEmployee({ id: EmployeeID });
-
-    setIsLoading(true);
-
-    PCore.getDataApiUtils()
-    .getData('D_AppraisalByEmployeeID', {}, context)
-    .then((response: any) => {
-      setIsLoading(false);
-      // eslint-disable-next-line no-console
-      console.log(response);
-      if (response.data.data !== null) {
-        setAppraisalData(response.data.data);
-      } else {
-        setAppraisalData([]);
+  const handleViewDetails = async (EmployeeID: string, EmployeeName : string) => {
+    setSelectedEmployee({ EmployeeID, EmployeeName });
+    setIsAppraisalModalOpen(true);
+    setIsAppraisalLoading(true);
+    const payload = {
+      dataViewParameters : {
+        Emp_ID : EmployeeID
       }
-    })
-    .catch((error: any) => {
-      setAppraisalData([]);
-      setIsLoading(false);
-    });
+    };
+    const data = await fetchDataPage<any>(detailsDataPage, context, payload);
+    setAppraisalData(data);
+    setIsAppraisalLoading(false);
+  };
+
+  const closeAppraisalModal = () => {
+    setIsAppraisalModalOpen(false);
+    setSelectedEmployee(null);
+    setAppraisalData([]);
   };
 
   return (
-    <>
       <div className='dashboard'>
         <GlobalStyle />
         <Card className="card">
           <Search placeholder='Search by Employee ID or Name...' onChange={(value) => handleSearch(value)} />
-          <h1>{PConnect.getLocalizedValue(title, '', '')}</h1>
-          <br/>
           <Table
-            columns={parsedColumns}
+            columns={tableColumns}
             data={employees}
             loading={isLoading}
             loadingMessage={PConnect.getLocalizedValue(loadingMessage, '', '')}
             onClick={handleViewDetails}
           />
-          <Appraisals appraisals={appraisalData} employeeId={selectedEmployee?.id ?? null} EmployeeName={""} />
+          {isAppraisalModalOpen && (
+            <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="appraisalModalTitle">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h2 id="appraisalModalTitle">
+                    Appraisals for {selectedEmployee?.EmployeeName} ({selectedEmployee?.EmployeeID})
+                  </h2>
+                  <button type="button" className="modal-close" aria-label="Close" onClick={closeAppraisalModal}>×</button>
+                </div>
+                <div className="modal-body">
+                  {
+                    isAppraisalLoading &&
+                    <p className="notice">Loading...</p>
+                  }
+                  {
+                    !isAppraisalLoading &&
+                    <Appraisals appraisals={appraisalData} />
+                  }
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
       </div>
-    </>
   );
 }
 

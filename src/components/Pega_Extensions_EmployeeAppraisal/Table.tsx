@@ -1,7 +1,7 @@
 import React from 'react';
 
 type Column<T> = {
-  renderer: keyof T | string; // changed from `key`
+  key: keyof T | string;
   label: string;
   render?: (row: T) => React.ReactNode;
 };
@@ -11,7 +11,7 @@ type TableProps<T> = {
   data: T[];
   loading?: boolean;
   loadingMessage?: string;
-  onClick: (value: string) => void;
+  onClick: (value: string, value2: string) => void;
 };
 
 function Table<T extends Record<string, any>>({
@@ -30,11 +30,8 @@ function Table<T extends Record<string, any>>({
           <thead>
             <tr>
               {columns.map((col) => (
-                <th key={String(col.renderer)}>{col.label}</th>
+                <th key={String(col.key)}>{col.label}</th>
               ))}
-              <th>
-                View All Appraisals
-              </th>
             </tr>
           </thead>
           <tbody>
@@ -43,16 +40,31 @@ function Table<T extends Record<string, any>>({
                 <td colSpan={columns.length}>No data available</td>
               </tr>
             ) : (
-              data.map((row) => (
-                <tr key={row.EmployeeID}>
-                  {columns.map((col) => (
-                    <td key={String(col.renderer)}>
-                      {col.render ? col.render(row) : row[col.renderer as keyof T]}
-                    </td>
-                  ))}
-                  <td>
-                    <button onClick={() => onClick(row.EmployeeID)}>View Details</button>
-                  </td>
+              data.map((row : any) => (
+                <tr key={ row.EmployeeID }>
+                  {columns.map((col) => {
+                    const isAction = String(col.key) === 'Action';
+                    let cellContent: React.ReactNode;
+                    if (isAction) {
+                      cellContent = (
+                        <button
+                          type="button"
+                          onClick={() => onClick(row.EmployeeID, row.EmployeeName)}
+                        >
+                          View Details
+                        </button>
+                      );
+                    } else if (col.render) {
+                      cellContent = col.render(row);
+                    } else {
+                      cellContent = row[col.key as keyof T] ?? '';
+                    }
+                    return (
+                      <td key={String(col.key)}>
+                        {cellContent}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             )}

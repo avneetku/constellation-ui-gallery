@@ -1,30 +1,8 @@
-import React, { useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import type { KRA } from './interfaces';
+import type { AppraisalsProps } from './interfaces';
 
-interface KRA {
-  name: string;
-  weightage: string;
-  selfRating: number;
-  managerRating: number;
-  finalRating: number;
-}
-
-interface Appraisal {
-  yearRange: string;
-  finalRating: number;
-  score: number;
-  kras: KRA[];
-  employeeComments: string;
-  managerComments: string;
-  hrComments: string;
-}
-
-interface AppraisalsProps {
-  EmployeeName: string | null;
-  employeeId: string | null;
-  appraisals: Appraisal[];
-}
-
-const Appraisals: React.FC<AppraisalsProps> = ({ EmployeeName, employeeId, appraisals }) => {
+const Appraisals: React.FC<AppraisalsProps> = ({ appraisals }) => {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   const toggleAccordion = (index: number) => {
@@ -33,59 +11,99 @@ const Appraisals: React.FC<AppraisalsProps> = ({ EmployeeName, employeeId, appra
 
   const renderStars = (rating: number) => {
     const fullStars = Math.floor(rating);
-    const stars = '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
-    return stars;
+    return '★'.repeat(fullStars) + '☆'.repeat(5 - fullStars);
   };
+
+  const contentRefs = useRef<Array<HTMLDivElement | null>>([]);
+
+  useEffect(() => {
+    // Adjust max-height to content scrollHeight for smooth transition
+    contentRefs.current.forEach((el, idx) => {
+      if (!el) return;
+      const isOpen = activeIndex === idx;
+      if (isOpen) {
+        el.style.maxHeight = `${el.scrollHeight}px`;
+      } else {
+        el.style.maxHeight = '0px';
+      }
+    });
+  }, [activeIndex, appraisals]);
 
   if (!appraisals || appraisals.length === 0) return null;
 
   return (
     <div id="appraisalDetailsContainer">
-      <h2>Appraisals for {EmployeeName} ({employeeId})</h2>
       {appraisals.map((appraisal, index) => (
-        <div key={index} className="accordion-item">
+        <div key={appraisal.Year} className="accordion-item">
           <div
-            className="accordion-header"
+            className={`accordion-header ${activeIndex === index ? 'active' : ''}`}
+            role="button"
+            tabIndex={0}
             onClick={() => toggleAccordion(index)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleAccordion(index);
+              }
+            }}
           >
-            {appraisal.yearRange} — Final Rating: {renderStars(appraisal.finalRating)} — Score: {appraisal.score}%
+            {appraisal.Year} — Final Rating: {renderStars(appraisal.score)} — Score: {appraisal.score}%
           </div>
 
           <div
+            ref={(el) => { contentRefs.current[index] = el; }}
             className={`accordion-content ${activeIndex === index ? 'show' : ''}`}
           >
             {activeIndex === index && (
               <>
-                <table className="kra-table">
-                  <thead>
-                    <tr>
-                      <th style={{ textAlign: 'left' }}>KRA</th>
-                      <th>Weightage</th>
-                      <th>Self Rating</th>
-                      <th>Manager Rating</th>
-                      <th>Final Rating</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {appraisal.kras.map((kra, i) => (
-                      <tr key={i}>
-                        <td style={{ textAlign: 'left' }}>{kra.name}</td>
-                        <td>{kra.weightage}</td>
-                        <td>{kra.selfRating}</td>
-                        <td>{kra.managerRating}</td>
-                        <td>{kra.finalRating}</td>
+                {appraisal.KRA.map((kraItem : KRA) => (
+                  <table key={kraItem.ID} className="kra-table">
+                    <thead>
+                      <tr>
+                        <th style={{ textAlign: 'left' }}>KRA Category</th>
+                        <th>Rating</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td style={{ textAlign: 'left' }}>Learning</td>
+                        <td>{kraItem.Learning}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ textAlign: 'left' }}>Leadership</td>
+                        <td>{kraItem.Leadership}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ textAlign: 'left' }}>Job Knowledge</td>
+                        <td>{kraItem.JobKnowledge}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ textAlign: 'left' }}>Communication Skills</td>
+                        <td>{kraItem.CommunicationSkills}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ textAlign: 'left' }}>Flexibility</td>
+                        <td>{kraItem.Flexibility}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ textAlign: 'left' }}>Initiative</td>
+                        <td>{kraItem.Initiative}</td>
+                      </tr>
+                      <tr>
+                        <td style={{ textAlign: 'left' }}>Policy Adherence</td>
+                        <td>{kraItem.PolicyAdherence}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                ))}
 
                 <div className="comments">
                   <h4>Employee Comments</h4>
-                  <p>{appraisal.employeeComments}</p>
+                  <p>{appraisal.EmployeeComments}</p>
                   <h4>Manager Comments</h4>
-                  <p>{appraisal.managerComments}</p>
+                  <p>{appraisal.ManagerComments}</p>
                   <h4>HR Final Comments</h4>
-                  <p>{appraisal.hrComments}</p>
+                  <p>{appraisal.HRFinalComments}</p>
                 </div>
               </>
             )}

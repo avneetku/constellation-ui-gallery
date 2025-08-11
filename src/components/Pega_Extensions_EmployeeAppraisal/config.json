@@ -11,44 +11,18 @@
   "subtype": "PAGE",
   "icon": "OneColumnPage.svg",
   "properties": [
-    {
-      "name": "displayAs",
-      "label": "Display as",
-      "format": "SELECT",
-      "defaultValue": "input",
-      "source": [
-        {
-           "key": "input",
-           "value": "Input"
-        },
-        {
-           "key": "stepper",
-           "value": "Stepper"
-        },
-        {
-           "key": "slider",
-           "value": "Slider"
-        }
-      ]
-    },
       {
         "name": "dataPage",
-        "label": "Data Page",
+        "label": "List Data Page",
         "format": "TEXT",
         "required": true,
         "defaultValue": ""
       },
       {
-        "name": "columns",
-        "label": "Columns",
+        "name": "detailsDataPage",
+        "label": "Details Data Page",
         "format": "TEXT",
         "required": true,
-        "defaultValue": ""
-      },
-      {
-        "name": "title",
-        "label": "Title",
-        "format": "TEXT",
         "defaultValue": ""
       },
       {

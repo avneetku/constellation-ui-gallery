@@ -1,5 +1,5 @@
 import React from 'react';
-import type {InputProps} from './interfaces';
+import type { InputProps } from './interfaces';
 
 const Input: React.FC<InputProps> = ({ placeholder, onChange }) => {
   return (
