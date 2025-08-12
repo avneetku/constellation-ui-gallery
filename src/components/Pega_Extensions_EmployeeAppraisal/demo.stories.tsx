@@ -148,33 +148,19 @@ const appraisalData = {
   data: {
     data: [
       {
+          "Emp_ID": "EMP014",
+          "ManagerComments": "Test",
+          "Year": 2024,
+          "EmployeeComments": "Test",
+          "HRFinalComments": "Test"
+      },
+      {
           "Emp_ID": "EMP015",
           "ManagerComments": "Test",
           "Year": 2024,
           "EmployeeComments": "Test",
           "HRFinalComments": "Test",
-          "KRA": [
-              {
-                  "Learning": "5",
-                  "Leadership": "5",
-                  "JobKnowledge": "5",
-                  "ID": "3",
-                  "CommunicationSkills": "5",
-                  "Flexibility": "5",
-                  "Initiative": "5",
-                  "PolicyAdherence": "5"
-              },
-              {
-                  "Learning": "4",
-                  "Leadership": "4",
-                  "JobKnowledge": "2",
-                  "ID": "2",
-                  "CommunicationSkills": "4",
-                  "Flexibility": "2",
-                  "Initiative": "4",
-                  "PolicyAdherence": "4"
-              }
-          ]
+          "KRA": null
       },
       {
           "Emp_ID": "EMP016",

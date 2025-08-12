@@ -56,8 +56,7 @@ const Appraisals: React.FC<AppraisalsProps> = ({ appraisals }) => {
           >
             {activeIndex === index && (
               <>
-              {Array.isArray(appraisal.KRA) && appraisal.KRA.length > 0 ? (
-                appraisal.KRA.map((kraItem: KRA) => (
+                {appraisal.KRA.map((kraItem : KRA) => (
                   <table key={kraItem.ID} className="kra-table">
                     <thead>
                       <tr>
@@ -96,10 +95,7 @@ const Appraisals: React.FC<AppraisalsProps> = ({ appraisals }) => {
                       </tr>
                     </tbody>
                   </table>
-                ))
-              ) : (
-                <p>No KRA data available.</p>
-              )}
+                ))}
 
                 <div className="comments">
                   <h4>Employee Comments</h4>

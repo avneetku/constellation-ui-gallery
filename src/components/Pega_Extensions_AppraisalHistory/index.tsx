@@ -9,13 +9,13 @@ import type { Employee } from './interfaces';
 import fetchDataPage from './apiUtils';
 import { debounce } from 'lodash';
 
-interface PegaExtensionsEmployeeAppraisalProps extends PConnFieldProps {
+interface PegaExtensionsAppraisalHistoryProps extends PConnFieldProps {
   dataPage: string;
   loadingMessage: string;
   detailsDataPage: string;
 }
 
-function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalProps) {
+function PegaExtensionsAppraisalHistory(props: PegaExtensionsAppraisalHistoryProps) {
 
   const { getPConnect, dataPage, loadingMessage, detailsDataPage } = props;
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -55,7 +55,7 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
     console.log('in loadEmployees');
     setIsLoading(true);
     const payload = searchText.trim()
-      ? { dataViewParameters: { Query: searchText.trim() } }
+      ? { dataViewParameters: { query: searchText.trim() } }
       : {};
 
     const keys = employeeListColumnsConfig.map(c => c.key);
@@ -98,7 +98,9 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
     setIsAppraisalModalOpen(true);
     setIsAppraisalLoading(true);
     const payload = {
-      dataViewParameters : { EmployeeID }
+      dataViewParameters : {
+        Emp_ID : EmployeeID
+      }
     };
     const data = await fetchDataPage<any>(detailsDataPage, context, payload);
     setAppraisalData(data);
@@ -150,4 +152,4 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
   );
 }
 
-export default withConfiguration(PegaExtensionsEmployeeAppraisal);
+export default withConfiguration(PegaExtensionsAppraisalHistory);
