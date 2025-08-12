@@ -54,13 +54,16 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
     // eslint-disable-next-line no-console
     console.log('in loadEmployees');
     setIsLoading(true);
-    const payload = searchText.trim()
-      ? { dataViewParameters: { Query: searchText.trim() } }
-      : {};
+
+    const payload = {
+      ...(searchText.trim() && { dataViewParameters: { Query: searchText.trim() } }),
+      paging: { pageNumber: 1, pageSize: 10 }
+    };
 
     const keys = employeeListColumnsConfig.map(c => c.key);
-    const data = await fetchDataPage<Employee>(dataPage, context, payload);
-    const formatted = data.map((entry: any, index: number) => {
+    const res = await fetchDataPage(dataPage, context, payload);
+
+    const formatted = (res.data || []).map((entry: any, index: number) => {
       const row: any = { id: index };
       keys.forEach((key) => {
         row[key] = entry?.[key] ?? '';
@@ -100,8 +103,8 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
     const payload = {
       dataViewParameters : { EmployeeID }
     };
-    const data = await fetchDataPage<any>(detailsDataPage, context, payload);
-    setAppraisalData(data);
+    const res = await fetchDataPage(detailsDataPage, context, payload);
+    setAppraisalData(res.data || []);
     setIsAppraisalLoading(false);
   };
 

@@ -29,7 +29,9 @@ const Appraisals: React.FC<AppraisalsProps> = ({ appraisals }) => {
     });
   }, [activeIndex, appraisals]);
 
-  if (!appraisals || appraisals.length === 0) return null;
+  if (!appraisals || appraisals.length === 0) {
+    return <p>No appraisal data available.</p>;
+  }
 
   return (
     <div id="appraisalDetailsContainer">
