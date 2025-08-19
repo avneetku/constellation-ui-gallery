@@ -4,6 +4,7 @@ import type { PConnFieldProps } from './PConnProps';
 import Table from './Table';
 import Search from './Search';
 import Appraisals from './Appraisals';
+import Pagination from './Pagination';
 import GlobalStyle from './styles';
 import type { Employee } from './interfaces';
 import fetchDataPage from './apiUtils';
@@ -20,9 +21,12 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
   const { getPConnect, dataPage, loadingMessage, detailsDataPage } = props;
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [searchText, setSearchText] = useState('');
+  const [pageNumber, setpageNumber] = useState(1);
+  const [hasMoreResults, setHasMoreResults] = useState(true);
   const [isLoading, setIsLoading] = useState(true);
   const PConnect = getPConnect();
   const context = PConnect.getContextName();
+  const pageSize = 10;
 
   const [selectedEmployee, setSelectedEmployee] = useState<{ EmployeeID: string; EmployeeName: string; } | null>(null);
   const [appraisalData, setAppraisalData] = useState<any[]>([]);
@@ -54,43 +58,61 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
     // eslint-disable-next-line no-console
     console.log('in loadEmployees');
     setIsLoading(true);
-    const payload = searchText.trim()
-      ? { dataViewParameters: { Query: searchText.trim() } }
-      : {};
-
+    const payload = {
+      ...(searchText.trim() && { dataViewParameters: { Query: searchText.trim() } }),
+      paging: { pageNumber, pageSize }
+    };
     const keys = employeeListColumnsConfig.map(c => c.key);
-    const data = await fetchDataPage<Employee>(dataPage, context, payload);
-    const formatted = data.map((entry: any, index: number) => {
+    const res = await fetchDataPage(dataPage, context, payload);
+    const formatted = (res.data || []).map((entry: any, index: number) => {
       const row: any = { id: index };
       keys.forEach((key) => {
         row[key] = entry?.[key] ?? '';
       });
       return row;
     });
+    setHasMoreResults(res.hasMoreResults || false);
     setEmployees(formatted);
     setIsLoading(false);
-  }, [searchText, employeeListColumnsConfig, dataPage, context]);
+  }, [searchText, employeeListColumnsConfig, dataPage, context, pageNumber]);
 
-  const debouncedSearch = useMemo(
-    () => debounce(() => {
-      // eslint-disable-next-line no-console
-      console.log('in debouncedSearch');
-      loadEmployees();
-    }, 500),
-    [loadEmployees]
-  );
-
+  // const debouncedSearch = useMemo(
+  //   () => debounce(() => {
+  //     // eslint-disable-next-line no-console
+  //     console.log('in debouncedSearch');
+  //     loadEmployees();
+  //   }, 500),
+  //   [loadEmployees]
+  // );
+  //
+  // useEffect(() => {
+  //   // eslint-disable-next-line no-console
+  //   console.log('useEffect for searchText & debouncedSearch');
+  //   debouncedSearch();
+  //   return () => debouncedSearch.cancel();
+  // }, [searchText, debouncedSearch]);
+  //
+  // useEffect(() => {
+  //   // eslint-disable-next-line no-console
+  //   console.log('in useEffect with pageNumber');
+  // loadEmployees();
+  // }, [pageNumber, loadEmployees]);
+  //
   useEffect(() => {
     // eslint-disable-next-line no-console
-    console.log('useEffect for searchText & debouncedSearch');
-    debouncedSearch();
-    return () => debouncedSearch.cancel();
-  }, [searchText, debouncedSearch]);
+    console.log('in useEffect');
+    const handler = debounce(() => {
+      loadEmployees();
+    }, 500);
+    handler();
+    return () => handler.cancel();
+  }, [searchText, pageNumber, loadEmployees]);
 
   const handleSearch = (value: string) => {
     // eslint-disable-next-line no-console
     console.log('handleSearch');
     setSearchText(value);
+    setpageNumber(1);
   };
 
   const handleViewDetails = async (EmployeeID: string, EmployeeName : string) => {
@@ -100,10 +122,16 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
     const payload = {
       dataViewParameters : { EmployeeID }
     };
-    const data = await fetchDataPage<any>(detailsDataPage, context, payload);
-    setAppraisalData(data);
+    const res = await fetchDataPage(detailsDataPage, context, payload);
+    setAppraisalData(res.data || []);
     setIsAppraisalLoading(false);
   };
+
+  const onPageChange = (page : number) => {
+    // eslint-disable-next-line no-console
+    console.log(page);
+    setpageNumber(page)
+  }
 
   const closeAppraisalModal = () => {
     setIsAppraisalModalOpen(false);
@@ -123,6 +151,11 @@ function PegaExtensionsEmployeeAppraisal(props: PegaExtensionsEmployeeAppraisalP
             loadingMessage={PConnect.getLocalizedValue(loadingMessage, '', '')}
             onClick={handleViewDetails}
           />
+          {
+            hasMoreResults && (
+              <Pagination pageNumber={pageNumber} hasMoreResults={hasMoreResults} onPageChange={onPageChange} />
+            )
+          }
           {isAppraisalModalOpen && (
             <div className="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="appraisalModalTitle">
               <div className="modal-content">

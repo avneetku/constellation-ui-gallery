@@ -1,11 +1,3 @@
-export interface EditRowPopupProps {
-  savablePage: string;
-  uniqueKey: string;
-  rowData: any;
-  onUpdate: (response: any) => void;
-  onClose: () => void;
-}
-
 export interface Data {
   [key: string]: any;
 }
@@ -58,8 +50,8 @@ export interface ListComponentProps {
 }
 
 export interface PaginationProps {
-  currentPage: number;
-  totalPages: number;
+  pageNumber: number;
+  hasMoreResults: boolean;
   onPageChange: (page: number) => void;
 }
 

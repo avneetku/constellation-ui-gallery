@@ -47,8 +47,8 @@ const GlobalStyle = createGlobalStyle`
     transition: 0.3s;
   }
 
-  button:hover {
-    background-color: #1564b3;
+  button:hover:not(:disabled) {
+    background-color: rgb(21, 100, 179);
     color: white;
   }
 
@@ -192,6 +192,22 @@ const GlobalStyle = createGlobalStyle`
     line-height: 1;
     cursor: pointer;
   }
+
+  .pagination-container button {
+    border-radius: 0;
+  }
+
+  .pagination-container button:first-of-type {
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    border-right: none;
+  }
+
+  .pagination-container button:last-of-type {
+    border-top-right-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
 `;
 
 export default GlobalStyle;
